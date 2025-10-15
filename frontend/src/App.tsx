@@ -18,6 +18,8 @@ type UpcomingResponse = { text: string };
 
 const API_BASE: string = getApiBase();
 
+type Theme = "light" | "dark";
+
 /** Build API base with default if env is unset */
 function getApiBase() {
   const env = (import.meta as any).env as { VITE_API_BASE?: string };
@@ -31,6 +33,7 @@ export default function App() {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [theme, setTheme] = useState<Theme>("light");
 
   const send = useCallback(
     async (e?: React.FormEvent) => {
@@ -103,11 +106,25 @@ export default function App() {
   }, [API_BASE]);
 
   return (
-    <div className="app-root">
+    <div className={`app-root theme-${theme}`}>
       <div className="chat-container">
         <header className="chat-header">
-          <h1>Personal AI Assistant</h1>
-          <p>Have a conversation, plan your day, and stay organized.</p>
+          <div className="header-content">
+            <div className="header-copy">
+              <h1>Personal AI Assistant</h1>
+              <p>Have a conversation, plan your day, and stay organized.</p>
+            </div>
+            <button
+              className="theme-toggle"
+              type="button"
+              onClick={() =>
+                setTheme((cur) => (cur === "light" ? "dark" : "light"))
+              }
+              aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+            >
+              {theme === "light" ? "Dark" : "Light"} mode
+            </button>
+          </div>
         </header>
 
         <main className="chat-history">
