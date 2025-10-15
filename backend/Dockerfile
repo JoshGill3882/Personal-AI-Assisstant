@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 WORKDIR /app
-COPY backend/pyproject.toml backend/poetry.lock* /app/ 2>/dev/null || true
+COPY pyproject.toml poetry.lock* /app/ 2>/dev/null || true
 RUN pip install --no-cache-dir poetry && poetry config virtualenvs.create false
 RUN poetry install --no-interaction --no-ansi || \
     pip install --no-cache-dir fastapi uvicorn[standard] httpx pydantic google-api-python-client google-auth-oauthlib google-auth python-dateutil
