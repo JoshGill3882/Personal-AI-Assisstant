@@ -23,6 +23,7 @@ services:
     volumes:
       - backend_data:/data
       - ./secrets/google/credentials.json:/run/secrets/google_credentials:ro
+      - ./secrets/google/token.json:/data/google_token.json:ro
     secrets:
       - google_credentials
     command: ["uvicorn","app.main:app","--host","0.0.0.0","--port","8080"]
