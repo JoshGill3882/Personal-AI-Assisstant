@@ -1,5 +1,6 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import axios, { AxiosError } from "axios";
+import "./App.css";
 
 type Role = "system" | "user" | "assistant";
 
@@ -15,16 +16,14 @@ type ChatResponse = { reply: string };
 
 type UpcomingResponse = { text: string };
 
-const API_BASE: string = useMemoApiBase();
+const API_BASE: string = getApiBase();
 
 /** Build API base with default if env is unset */
-function useMemoApiBase() {
-  return useMemo(() => {
-    const env = (import.meta as any).env as { VITE_API_BASE?: string };
-    // NOTE: in the browser, "localhost" means the *browser's* machine
-    // If your backend runs on the Pi, prefer http://PI_IP:8080
-    return env?.VITE_API_BASE?.trim() || "http://localhost:8080";
-  }, []);
+function getApiBase() {
+  const env = (import.meta as any).env as { VITE_API_BASE?: string };
+  // NOTE: in the browser, "localhost" means the *browser's* machine
+  // If your backend runs on the Pi, prefer http://PI_IP:8080
+  return env?.VITE_API_BASE?.trim() || "http://localhost:8080";
 }
 
 export default function App() {
@@ -70,7 +69,7 @@ export default function App() {
         setError(msg);
         setMessages((cur) => [
           ...cur,
-          { role: "assistant", content: `⚠️ Error: ${msg}` },
+          { role: "assistant", content: `[Error] ${msg}` },
         ]);
       } finally {
         setBusy(false);
@@ -96,7 +95,7 @@ export default function App() {
       setError(msg);
       setMessages((cur) => [
         ...cur,
-        { role: "assistant", content: `⚠️ Error: ${msg}` },
+        { role: "assistant", content: `[Error] ${msg}` },
       ]);
     } finally {
       setBusy(false);
@@ -104,52 +103,73 @@ export default function App() {
   }, [API_BASE]);
 
   return (
-    <div
-      style={{ maxWidth: 800, margin: "40px auto", fontFamily: "system-ui" }}
-    >
-      <h1>Pi Assistant</h1>
+    <div className="app-root">
+      <div className="chat-container">
+        <header className="chat-header">
+          <h1>Personal AI Assistant</h1>
+          <p>Have a conversation, plan your day, and stay organized.</p>
+        </header>
 
-      <div
-        style={{
-          border: "1px solid #ddd",
-          padding: 16,
-          borderRadius: 8,
-          minHeight: 320,
-          background: "#fff",
-        }}
-      >
-        {messages.map((m, i) => (
-          <div key={i} style={{ whiteSpace: "pre-wrap", marginBottom: 12 }}>
-            <b>{m.role === "user" ? "You" : "Assistant"}:</b> {m.content}
+        <main className="chat-history">
+          {messages.length === 0 && !busy ? (
+            <div className="chat-empty">
+              <h2>Start a conversation</h2>
+              <p>Send a prompt below to begin chatting with your assistant.</p>
+            </div>
+          ) : null}
+
+          {messages.map((m, i) => (
+            <div key={i} className={`chat-message ${m.role}`}>
+              <span className="badge">{m.role === "user" ? "You" : "AI"}</span>
+              <div className="bubble">{m.content}</div>
+            </div>
+          ))}
+
+          {busy && (
+            <div className="chat-status">
+              <span className="dot-pulse" aria-hidden="true"></span>
+              <span>Assistant is thinking...</span>
+            </div>
+          )}
+        </main>
+
+        <form className="chat-input" onSubmit={send}>
+          <input
+            className="chat-text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Send a prompt to your assistant..."
+            autoFocus
+          />
+          <div className="chat-actions">
+            <button
+              className="button primary"
+              type="submit"
+              disabled={busy || !input.trim()}
+            >
+              Send
+            </button>
+            <button
+              className="button secondary"
+              type="button"
+              onClick={listUpcoming}
+              disabled={busy}
+            >
+              Upcoming
+            </button>
           </div>
-        ))}
-        {busy && <div>…thinking…</div>}
+        </form>
+
+        {error && (
+          <div className="chat-error" role="alert">
+            <strong>Error:</strong> {error}
+          </div>
+        )}
+
+        <footer className="chat-footer">
+          <span>API: {API_BASE}</span>
+        </footer>
       </div>
-
-      <form onSubmit={send} style={{ display: "flex", gap: 8, marginTop: 12 }}>
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type a message…"
-          style={{ flex: 1, padding: 8 }}
-        />
-        <button type="submit" disabled={busy || !input.trim()}>
-          Send
-        </button>
-        <button type="button" onClick={listUpcoming} disabled={busy}>
-          Upcoming
-        </button>
-      </form>
-
-      {error && (
-        <p style={{ color: "crimson", marginTop: 8 }}>
-          <b>Error:</b> {error}
-        </p>
-      )}
-
-      <small style={{ display: "block", marginTop: 8, opacity: 0.7 }}>
-        API: {API_BASE}
-      </small>
     </div>
   );
 }
@@ -164,10 +184,17 @@ function formatAxiosError(err: unknown): string {
         typeof ae.response.data === "string"
           ? ae.response.data
           : ae.response.data?.detail || "";
-      return detail ? `${status} — ${detail}` : status;
+      return detail ? `${status} - ${detail}` : status;
     }
     if (ae.request) return "Network error / API unreachable";
     return ae.message || "Unknown axios error";
   }
   return (err as Error)?.message || "Unknown error";
 }
+
+
+
+
+
+
+
