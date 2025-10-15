@@ -1,0 +1,50 @@
+version: "3.9"
+services:
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    # On first start you'll pull a model:
+    # docker exec -it <container> ollama pull phi3:mini
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      OLLAMA_ENDPOINT: http://ollama:11434
+      MODEL_NAME: phi3:mini
+      CORS_ORIGINS: http://localhost:5173,http://localhost:8080
+      GOOGLE_CRED_PATH: /run/secrets/google_credentials
+      GOOGLE_TOKEN_PATH: /data/google_token.json
+    ports:
+      - "8080:8080"
+    depends_on:
+      - ollama
+    volumes:
+      - backend_data:/data
+    secrets:
+      - google_credentials
+    command: ["uvicorn","app.main:app","--host","0.0.0.0","--port","8080"]
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      VITE_API_BASE: http://localhost:8080
+    ports:
+      - "5173:5173"
+    command: ["npm","run","dev"]
+    depends_on:
+      - backend
+
+secrets:
+  google_credentials:
+    file: ./secrets/google/credentials.json
+
+volumes:
+  ollama:
+  backend_data:
