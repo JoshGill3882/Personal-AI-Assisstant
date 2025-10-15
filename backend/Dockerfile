@@ -1,9 +1,16 @@
 FROM python:3.12-slim
+
 WORKDIR /app
-COPY pyproject.toml poetry.lock* /app/ 2>/dev/null || true
-RUN pip install --no-cache-dir poetry && poetry config virtualenvs.create false
-RUN poetry install --no-interaction --no-ansi || \
-    pip install --no-cache-dir fastapi uvicorn[standard] httpx pydantic google-api-python-client google-auth-oauthlib google-auth python-dateutil
+
+# Install system deps if you need them later (e.g., build tools)
+# RUN apt-get update && apt-get install -y --no-install-recommends build-essential && rm -rf /var/lib/apt/lists/*
+
+# Install Python deps
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy app code
 COPY app /app/app
+
 EXPOSE 8080
 CMD ["uvicorn","app.main:app","--host","0.0.0.0","--port","8080"]
