@@ -5,7 +5,7 @@ from .llm_client import chat_completion
 from .schemas import ChatRequest, ScheduleRequest
 from . import calendar_tool
 
-app = FastAPI(title="Pi Assistant API", root_path="/api")
+app = FastAPI(title="Pi Assistant API")
 
 origins = [o.strip() for o in settings.CORS_ORIGINS.split(",")]
 app.add_middleware(
