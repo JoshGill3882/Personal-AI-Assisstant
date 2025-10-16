@@ -20,8 +20,15 @@ body {
   min-height: 100vh;
   background-color: inherit;
   color: inherit;
+  overflow: hidden;
 }
 
 #root {
   min-height: 100vh;
+}
+
+@media (max-width: 720px) {
+  body {
+    overflow: auto;
+  }
 }
