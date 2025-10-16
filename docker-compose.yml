@@ -13,7 +13,7 @@ services:
     environment:
       OLLAMA_ENDPOINT: http://ollama:11434
       MODEL_NAME: phi3:mini
-      CORS_ORIGINS: https://assistant.joshgill.dev,http://localhost:5173,http://localhost:8080
+      CORS_ORIGINS: https://api.joshgill.dev,https://assistant.joshgill.dev,http://localhost:5173,http://localhost:8080
       GOOGLE_CRED_PATH: /run/secrets/google_credentials
       GOOGLE_TOKEN_PATH: /data/google_token.json
     ports:
