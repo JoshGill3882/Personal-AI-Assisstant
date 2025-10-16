@@ -2,6 +2,8 @@ import { useCallback, useState } from "react";
 import axios, { AxiosError } from "axios";
 import "./App.css";
 
+axios.defaults.withCredentials = true;
+
 type Role = "system" | "user" | "assistant";
 
 type Msg = {
@@ -72,7 +74,7 @@ export default function App() {
         const res = await axios.post<ChatResponse>(
           `${API_BASE}/chat`,
           payload,
-          { timeout: 180_000 }
+          { timeout: 180_000, withCredentials: true }
         );
 
         setMessages((cur) => [
@@ -99,7 +101,7 @@ export default function App() {
     try {
       const res = await axios.get<UpcomingResponse>(
         `${API_BASE}/calendar/upcoming`,
-        { params: { days: 7 }, timeout: 60_000 }
+        { params: { days: 7 }, timeout: 60_000, withCredentials: true }
       );
       setMessages((cur) => [
         ...cur,
