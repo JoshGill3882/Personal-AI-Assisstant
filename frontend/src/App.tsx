@@ -16,8 +16,6 @@ type ChatMessage = { role: Role; content: string };
 type ChatRequest = { messages: ChatMessage[] };
 type ChatResponse = { reply: string };
 
-type UpcomingResponse = { text: string };
-
 const API_BASE: string = getApiBase();
 
 type Theme = "light" | "dark";
@@ -95,30 +93,6 @@ export default function App() {
     [API_BASE, busy, input, messages]
   );
 
-  const listUpcoming = useCallback(async () => {
-    setError(null);
-    setBusy(true);
-    try {
-      const res = await axios.get<UpcomingResponse>(
-        `${API_BASE}/calendar/upcoming`,
-        { params: { days: 7 }, timeout: 60_000, withCredentials: true }
-      );
-      setMessages((cur) => [
-        ...cur,
-        { role: "assistant", content: res.data.text || "No events." },
-      ]);
-    } catch (err) {
-      const msg = formatAxiosError(err);
-      setError(msg);
-      setMessages((cur) => [
-        ...cur,
-        { role: "assistant", content: `[Error] ${msg}` },
-      ]);
-    } finally {
-      setBusy(false);
-    }
-  }, [API_BASE]);
-
   return (
     <div className={`app-root theme-${theme}`}>
       <div className="chat-container">
@@ -179,14 +153,6 @@ export default function App() {
               disabled={busy || !input.trim()}
             >
               Send
-            </button>
-            <button
-              className="button secondary"
-              type="button"
-              onClick={listUpcoming}
-              disabled={busy}
-            >
-              Upcoming
             </button>
           </div>
         </form>

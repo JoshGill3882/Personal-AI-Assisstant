@@ -1,13 +1,15 @@
 .app-root {
   height: 100vh;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: clamp(24px, 4vh, 48px) clamp(24px, 8vw, 120px);
+  padding: clamp(24px, 4vh, 48px);
   background: var(--page-background);
   color: var(--text-color);
   transition: background 0.4s ease, color 0.4s ease;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .app-root.theme-light {
@@ -79,7 +81,7 @@
 }
 
 .chat-container {
-  width: min(1200px, 100%);
+  width: min(1280px, calc(100vw - clamp(48px, 12vw, 200px)));
   background: var(--surface-primary);
   border-radius: 24px;
   border: 1px solid var(--surface-border);
@@ -87,7 +89,7 @@
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   overflow: hidden;
-  height: min(860px, calc(100vh - clamp(48px, 8vh, 140px)));
+  height: min(920px, calc(100vh - clamp(64px, 12vh, 160px)));
   transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, color 0.3s ease;
 }
 
@@ -139,13 +141,12 @@
 }
 
 .chat-history {
-  flex: 1 1 auto;
-  padding: 32px 36px;
+  padding: 36px 40px;
   background: var(--surface-muted);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
   transition: background 0.4s ease;
 }
 
@@ -254,16 +255,16 @@
 }
 
 .chat-input {
-  padding: 24px 36px 28px;
+  padding: 24px 40px 32px;
   background: var(--surface-primary);
   border-top: 1px solid var(--footer-border);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
   gap: 16px;
+  align-items: center;
 }
 
 .chat-text {
-  width: 100%;
+  flex: 1 1 auto;
   border: 1px solid var(--input-border);
   background: var(--surface-primary);
   border-radius: 16px;
@@ -289,6 +290,7 @@
   gap: 12px;
   justify-content: flex-end;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .button {
