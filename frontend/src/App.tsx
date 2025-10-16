@@ -17,12 +17,19 @@ type ChatResponse = { reply: string };
 type UpcomingResponse = { text: string };
 
 const API_BASE: string = getApiBase();
+const API_HEADERS = getApiHeaders();
 
 type Theme = "light" | "dark";
 
+type Env = {
+  VITE_API_BASE?: string;
+  VITE_CF_ACCESS_CLIENT_ID?: string;
+  VITE_CF_ACCESS_CLIENT_SECRET?: string;
+};
+
 /** Build API base with default if env is unset */
 function getApiBase() {
-  const env = (import.meta as any).env as { VITE_API_BASE?: string };
+  const env = (import.meta as any).env as Env;
   const configured = env?.VITE_API_BASE?.trim();
   if (configured) return configured;
 
@@ -34,6 +41,25 @@ function getApiBase() {
   }
 
   return "http://localhost:8080";
+}
+
+/** Provide Cloudflare Access service token headers when configured */
+function getApiHeaders():
+  | {
+      "CF-Access-Client-Id": string;
+      "CF-Access-Client-Secret": string;
+    }
+  | undefined {
+  const env = (import.meta as any).env as Env;
+  const id = env?.VITE_CF_ACCESS_CLIENT_ID?.trim();
+  const secret = env?.VITE_CF_ACCESS_CLIENT_SECRET?.trim();
+  if (id && secret) {
+    return {
+      "CF-Access-Client-Id": id,
+      "CF-Access-Client-Secret": secret,
+    };
+  }
+  return undefined;
 }
 
 export default function App() {
@@ -68,7 +94,7 @@ export default function App() {
         const res = await axios.post<ChatResponse>(
           `${API_BASE}/chat`,
           payload,
-          { timeout: 180_000 }
+          { timeout: 180_000, headers: API_HEADERS }
         );
 
         setMessages((cur) => [
@@ -95,7 +121,7 @@ export default function App() {
     try {
       const res = await axios.get<UpcomingResponse>(
         `${API_BASE}/calendar/upcoming`,
-        { params: { days: 7 }, timeout: 60_000 }
+        { params: { days: 7 }, timeout: 60_000, headers: API_HEADERS }
       );
       setMessages((cur) => [
         ...cur,
