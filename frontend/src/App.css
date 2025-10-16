@@ -3,7 +3,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: clamp(24px, 5vh, 48px) clamp(16px, 6vw, 80px);
+  padding: clamp(24px, 4vh, 48px) clamp(24px, 8vw, 120px);
   background: var(--page-background);
   color: var(--text-color);
   transition: background 0.4s ease, color 0.4s ease;
@@ -79,15 +79,15 @@
 }
 
 .chat-container {
-  width: min(1100px, 100%);
+  width: min(1200px, 100%);
   background: var(--surface-primary);
-  border-radius: 20px;
+  border-radius: 24px;
   border: 1px solid var(--surface-border);
   box-shadow: var(--surface-shadow);
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   overflow: hidden;
-  max-height: calc(100vh - clamp(48px, 10vh, 120px));
+  height: min(860px, calc(100vh - clamp(48px, 8vh, 140px)));
   transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, color 0.3s ease;
 }
 
@@ -140,7 +140,7 @@
 
 .chat-history {
   flex: 1 1 auto;
-  padding: 28px 32px;
+  padding: 32px 36px;
   background: var(--surface-muted);
   overflow-y: auto;
   display: flex;
@@ -254,11 +254,11 @@
 }
 
 .chat-input {
-  padding: 24px 32px;
+  padding: 24px 36px 28px;
   background: var(--surface-primary);
   border-top: 1px solid var(--footer-border);
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 16px;
 }
 
@@ -266,8 +266,8 @@
   width: 100%;
   border: 1px solid var(--input-border);
   background: var(--surface-primary);
-  border-radius: 14px;
-  padding: 16px 18px;
+  border-radius: 16px;
+  padding: 18px 20px;
   font-size: 1rem;
   line-height: 1.5;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
@@ -288,6 +288,7 @@
   display: flex;
   gap: 12px;
   justify-content: flex-end;
+  align-items: center;
 }
 
 .button {
@@ -345,13 +346,14 @@
   .chat-container {
     border-radius: 16px;
     max-height: none;
+    display: flex;
+    flex-direction: column;
   }
 
   .chat-header,
   .chat-history,
   .chat-input {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding: 20px;
     grid-template-columns: minmax(0, 1fr);
   }
 
