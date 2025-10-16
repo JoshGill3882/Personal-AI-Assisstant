@@ -40,6 +40,16 @@ services:
     depends_on:
       - backend
 
+  proxy:
+    image: nginx:alpine
+    depends_on:
+      - frontend
+      - backend
+    volumes:
+      - ./reverse-proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8081:80"
+
 secrets:
   google_credentials:
     file: ./secrets/google/credentials.json
