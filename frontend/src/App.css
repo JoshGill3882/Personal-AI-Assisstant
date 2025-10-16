@@ -324,21 +324,9 @@
 }
 
 .chat-error {
-  padding: 12px 32px 0;
+  padding: 12px 32px 28px;
   color: var(--error-color);
   font-size: 0.95rem;
-}
-
-.chat-footer {
-  padding: 16px 32px 28px;
-  font-size: 0.85rem;
-  color: var(--footer-text);
-  border-top: 1px solid var(--footer-border);
-  background: var(--footer-bg);
-}
-
-.chat-footer span {
-  user-select: all;
 }
 
 @media (max-width: 720px) {
@@ -352,8 +340,7 @@
 
   .chat-header,
   .chat-history,
-  .chat-input,
-  .chat-footer {
+  .chat-input {
     padding-left: 20px;
     padding-right: 20px;
   }

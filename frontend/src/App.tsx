@@ -23,9 +23,17 @@ type Theme = "light" | "dark";
 /** Build API base with default if env is unset */
 function getApiBase() {
   const env = (import.meta as any).env as { VITE_API_BASE?: string };
-  // NOTE: in the browser, "localhost" means the *browser's* machine
-  // If your backend runs on the Pi, prefer http://PI_IP:8080
-  return env?.VITE_API_BASE?.trim() || "http://localhost:8080";
+  const configured = env?.VITE_API_BASE?.trim();
+  if (configured) return configured;
+
+  if (typeof window !== "undefined") {
+    const { protocol, hostname } = window.location;
+    const needsPort = hostname === "localhost" || hostname === "127.0.0.1";
+    const port = needsPort ? ":8080" : "";
+    return `${protocol}//${hostname}${port}`;
+  }
+
+  return "http://localhost:8080";
 }
 
 export default function App() {
@@ -182,10 +190,6 @@ export default function App() {
             <strong>Error:</strong> {error}
           </div>
         )}
-
-        <footer className="chat-footer">
-          <span>API: {API_BASE}</span>
-        </footer>
       </div>
     </div>
   );
