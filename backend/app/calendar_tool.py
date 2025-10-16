@@ -1,6 +1,6 @@
 from __future__ import annotations
 from datetime import datetime, timedelta
-import os, json
+import os
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
@@ -29,21 +29,41 @@ def get_service():
     creds = _load_creds()
     return build("calendar", "v3", credentials=creds, cache_discovery=False)
 
+def _format_start(start_value: str | None) -> str:
+    if not start_value:
+        return "time to be confirmed"
+    try:
+        dt = datetime.fromisoformat(start_value.replace("Z", "+00:00"))
+        return dt.strftime("%a %d %b %Y at %H:%M")
+    except ValueError:
+        return start_value
+
 def list_events(days=7):
     svc = get_service()
     now = datetime.utcnow().isoformat() + "Z"
     until = (datetime.utcnow() + timedelta(days=days)).isoformat() + "Z"
-    events_result = svc.events().list(calendarId="primary",
-                                      timeMin=now, timeMax=until,
-                                      singleEvents=True, orderBy="startTime").execute()
+    events_result = svc.events().list(
+        calendarId="primary",
+        timeMin=now,
+        timeMax=until,
+        singleEvents=True,
+        orderBy="startTime",
+    ).execute()
     events = events_result.get("items", [])
-    # format simple text
-    lines = []
-    for e in events:
-        start = e["start"].get("dateTime", e["start"].get("date"))
-        summary = e.get("summary", "(no title)")
-        lines.append(f"- {start}: {summary}")
-    return "\n".join(lines) if lines else "No upcoming events."
+    if not events:
+        return "You have no events coming up in the next few days."
+
+    lines = ["Here's what you have coming up:"]
+    for idx, evt in enumerate(events, start=1):
+        summary = evt.get("summary") or "(no title)"
+        start_raw = evt["start"].get("dateTime", evt["start"].get("date"))
+        when = _format_start(start_raw)
+        location = evt.get("location")
+        details = f"{idx}. {summary} — {when}"
+        if location:
+            details += f" @ {location}"
+        lines.append(details)
+    return "\n".join(lines)
 
 def create_event(title: str, start_iso: str, end_iso: str, description: str|None=None):
     svc = get_service()
