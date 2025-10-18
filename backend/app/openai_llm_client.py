@@ -88,7 +88,6 @@ def _choose_model(messages: Sequence[Message]) -> Tuple[str, float]:
 async def chat_completion(
     messages: Iterable[Message],
     temperature: float = 0.2,
-    max_tokens: Optional[int] = None,
 ) -> str:
     """Request a chat completion from OpenAI after picking an appropriate model."""
     prepared = _normalize_messages(messages)
@@ -99,7 +98,7 @@ async def chat_completion(
         model=model_name,
         messages=prepared,
         temperature=temperature,
-        max_tokens=max_tokens or settings.LLM_MAX_TOKENS,
+        max_tokens=settings.LLM_MAX_TOKENS,
     )
     # Fall back to empty string when OpenAI does not return any text.
     return completion.choices[0].message.content or ""

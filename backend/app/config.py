@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     OPENAI_COMPLEXITY_LENGTH_WEIGHT: float = 0.05
     OPENAI_COMPLEXITY_QUESTION_WEIGHT: float = 2.0
     OPENAI_COMPLEXITY_KEYWORD_BONUS: float = 12.0
+    LLM_MAX_TOKENS: int = 2048
 
 
 settings = Settings()
