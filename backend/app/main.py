@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from . import calendar_tool
 from .config import settings
-from .llm_client import chat_completion
+from .openai_llm_client import chat_completion
 from .schemas import ChatRequest, ScheduleRequest
 
 app = FastAPI(title="Pi Assistant API")

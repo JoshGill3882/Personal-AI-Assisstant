@@ -1,27 +1,15 @@
 services:
-  # Local model runtime powering chat completions.
-  ollama:
-    image: ollama/ollama:latest
-    restart: unless-stopped
-    volumes:
-      - ollama:/root/.ollama
-    # On first start you'll pull a model:
-    # docker exec -it <container> ollama pull phi3:mini
-
   # FastAPI backend that mediates between the frontend, LLM, and Google APIs.
   backend:
     build: ./backend
     restart: unless-stopped
     environment:
-      OLLAMA_ENDPOINT: http://ollama:11434
-      MODEL_NAME: phi3:mini
       CORS_ORIGINS: https://api.assistant.joshgill.dev,https://assistant.joshgill.dev,http://localhost:5173,http://localhost:8080
       GOOGLE_CRED_PATH: /run/secrets/google_credentials
       GOOGLE_TOKEN_PATH: /data/google_token.json
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
     ports:
       - "8080:8080"
-    depends_on:
-      - ollama
     volumes:
       - backend_data:/data
       - ./secrets/google/credentials.json:/run/secrets/google_credentials
@@ -60,6 +48,5 @@ secrets:
     file: ./secrets/google/credentials.json
 
 volumes:
-  # Persist local model weights and backend-issued Google tokens.
-  ollama:
+  # Persist backend-issued Google tokens.
   backend_data:
