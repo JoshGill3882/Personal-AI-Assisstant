@@ -1,4 +1,5 @@
 services:
+  # Local model runtime powering chat completions.
   ollama:
     image: ollama/ollama:latest
     restart: unless-stopped
@@ -7,6 +8,7 @@ services:
     # On first start you'll pull a model:
     # docker exec -it <container> ollama pull phi3:mini
 
+  # FastAPI backend that mediates between the frontend, LLM, and Google APIs.
   backend:
     build: ./backend
     restart: unless-stopped
@@ -28,6 +30,7 @@ services:
       - google_credentials
     command: ["uvicorn","app.main:app","--host","0.0.0.0","--port","8080"]
 
+  # React + Vite frontend served via the Vite dev server in development.
   frontend:
     build:
       context: ./frontend
@@ -40,6 +43,7 @@ services:
     depends_on:
       - backend
 
+  # Nginx reverse proxy exposing both frontend assets and the API.
   proxy:
     image: nginx:alpine
     depends_on:
@@ -51,9 +55,11 @@ services:
       - "8081:80"
 
 secrets:
+  # Google OAuth client secret made available to the backend container.
   google_credentials:
     file: ./secrets/google/credentials.json
 
 volumes:
+  # Persist local model weights and backend-issued Google tokens.
   ollama:
   backend_data:

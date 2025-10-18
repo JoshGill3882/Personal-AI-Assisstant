@@ -1,3 +1,4 @@
+# Runtime dependencies for the FastAPI backend service.
 fastapi
 uvicorn[standard]
 httpx

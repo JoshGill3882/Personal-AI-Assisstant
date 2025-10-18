@@ -1,17 +1,24 @@
+/**
+ * Top-level chat interface for the Personal AI Assistant frontend.
+ * Handles message state, LLM calls, and calendar helper actions.
+ */
+
 import { useCallback, useState } from "react";
 import axios, { AxiosError } from "axios";
 import "./App.css";
 
+// Ensure cookies / auth headers accompany every request to the backend.
 axios.defaults.withCredentials = true;
 
 type Role = "system" | "user" | "assistant";
 
 type Msg = {
-  role: Exclude<Role, "system">; // local chat only stores user/assistant
+  // Local conversation only ever stores user and assistant messages.
+  role: Exclude<Role, "system">;
   content: string;
 };
 
-// Payload types matching FastAPI schema
+// Payload types mirroring the FastAPI schema.
 type ChatMessage = { role: Role; content: string };
 type ChatRequest = { messages: ChatMessage[] };
 type ChatResponse = { reply: string };
@@ -20,12 +27,11 @@ type UpcomingResponse = { text: string };
 const API_BASE: string = getApiBase();
 
 type Theme = "light" | "dark";
-
 type Env = {
   VITE_API_BASE?: string;
 };
 
-/** Build API base with default if env is unset */
+/** Build API base with default if env is unset. */
 function getApiBase() {
   const env = (import.meta as any).env as Env;
   const configured = env?.VITE_API_BASE?.trim();
@@ -42,10 +48,12 @@ function getApiBase() {
 }
 
 export default function App() {
+  // Conversation history displayed in the chat window.
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Theme toggle purely affects CSS class name.
   const [theme, setTheme] = useState<Theme>("dark");
 
   const send = useCallback(
@@ -57,15 +65,16 @@ export default function App() {
       setError(null);
       setBusy(true);
 
+      // Store the user message locally before calling the backend.
       const next: Msg[] = [...messages, { role: "user", content: trimmed }];
       setMessages(next);
       setInput("");
 
       try {
-        // Convert local Msg[] to backend ChatMessage[]
+        // Convert local Msg[] to backend ChatMessage[].
         const payload: ChatRequest = {
           messages: next.map((m) => ({
-            role: m.role, // 'user' | 'assistant'
+            role: m.role,
             content: m.content,
           })) as ChatMessage[],
         };
@@ -102,6 +111,7 @@ export default function App() {
         `${API_BASE}/calendar/upcoming`,
         { params: { days: 7 }, timeout: 60_000, withCredentials: true }
       );
+
       setMessages((cur) => [
         ...cur,
         { role: "assistant", content: res.data.text || "No events." },
@@ -200,7 +210,7 @@ export default function App() {
   );
 }
 
-/** Nicely format axios/network errors */
+/** Nicely format axios/network errors for display. */
 function formatAxiosError(err: unknown): string {
   if (axios.isAxiosError(err)) {
     const ae = err as AxiosError<any>;
@@ -217,10 +227,3 @@ function formatAxiosError(err: unknown): string {
   }
   return (err as Error)?.message || "Unknown error";
 }
-
-
-
-
-
-
-

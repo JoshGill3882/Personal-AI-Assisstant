@@ -1,3 +1,5 @@
+# Ignore environment overrides committed in any subproject.
 **/.env
 
+# Keep credential material local only.
 secrets/**
